@@ -61,3 +61,61 @@ function blob(size, xCenter, yCenter, k, t) {
   }
   endShape();
 }
+// Bump function, 0 outside [-1, 1], argmax = 0
+function bump(x) {
+  if (abs(x) < 1) {
+    return ( sin(PI * (x + 0.5)) + 1 ) / 2;
+    //return (exp(-1/(1-x**2)));
+  } else {
+    return 0;
+  }
+}
+
+// Adds a bump (or valley is peakSize < 0)
+// at idx in radiusDist
+// is baseSize wise and peakSize tall
+function sculpt(idx, baseSize, peakSize) {
+  // There are two i's to deal correctly with the n|0 frontier
+  // i1 is for the index in radiusDist, 
+  // it will always be inside [0, n[,
+  // i2 is for the calculation of the bump
+  let i1 = floor(idx - baseSize/2);
+  let i2 = i1;
+  
+  if (i1 < 0) {
+    i1 += n;
+  }
+  
+  while (i2 < idx + baseSize/2) {
+    let x = (2 * (i2 - idx)) / baseSize;
+    let y = peakSize * bump(x);
+    if (radiusDist[i1] + y > 0) { // (y can be negative)
+      radiusDist[i1] += y;
+    }
+    i1++;
+    if (i1 >= n) {
+      i1 -= n;
+    }
+    i2++;
+  }
+}
+
+// Draws a happy face :)
+function drawFace(t) {
+  // eyes
+  fill(0);
+  circle(width/2 - 35 + 10*noise(t), height/2 - 37 + 10*noise(t+1), 8);
+  circle(width/2 + 25 + 10*noise(t+2), height/2 - 30 + 10*noise(t+3), 8);
+  // mouth
+  stroke(0);
+  noFill();
+  strokeWeight(2);
+  beginShape();
+  vertex(width/2 - 46 + 10*noise(t+4), height/2 - 22 + 10*noise(t+5));
+  quadraticVertex(width/2 - 5 + 10*noise(t+6), 
+                  height/2 - 10 + 10*noise(t+7),
+                  width/2 + 37 + 10*noise(t+8), 
+                  height/2 - 15 + 10*noise(t+9));
+  endShape();
+  noStroke();
+}
