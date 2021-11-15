@@ -119,3 +119,14 @@ function drawFace(t) {
   endShape();
   noStroke();
 }
+function mouseClicked() {
+  // vector from the center of the sketch to the mouse position
+  let v = createVector(mouseX - width/2, mouseY - height/2);
+  let theta = map(v.heading(), -PI, PI, PI, 3 * PI);
+  let idx = floor(theta / step);
+  let peak = 10;
+  if (keyIsPressed) {
+    peak *= -1;
+  }
+  sculpt(idx, 75, peak);
+}
